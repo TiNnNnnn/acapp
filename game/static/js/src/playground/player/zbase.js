@@ -138,8 +138,6 @@ class Player extends AcGameObject {
                 this.move_length -= moved;
             }
         }
-
-
         this.render();
     }
 
