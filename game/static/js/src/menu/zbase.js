@@ -36,10 +36,12 @@ class AcGameMenu{
         let outer = this;
         this.$single_mode.click(function(){
             outer.hide(); //隐藏菜单
-            outer.root.playground.show(); //显示游戏界面
+            outer.root.playground.show("single mode"); //显示游戏界面
         });
         this.$muti_mode.click(function(){
-            console.log("click muti mode");
+            outer.hide(); //隐藏菜单
+            outer.root.playground.show("multi mode"); //显示游戏界面
+
         });
         this.$settings.click(function(){
             console.log("click settings");

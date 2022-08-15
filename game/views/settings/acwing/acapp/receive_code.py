@@ -33,16 +33,14 @@ def receive_code(request):
         'code': code
     }
 
-    
-
     access_token_res = requests.get(apply_access_token_url,params=params).json()
 
     access_token = access_token_res['access_token']
     openid = access_token_res['openid']
 
-    players  =Player.objects.filter(openid=openid)
+    players = Player.objects.filter(openid=openid)
     if players.exists(): #用户已存在，无需获得信息，直接登录
-        player = player[0]
+        player = players[0]
         return JsonResponse({
             'result':"success",
             'username':player.user.username,

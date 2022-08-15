@@ -15,36 +15,50 @@ class AcGamePlayground {
     }
 
     start() {
-        let outer  =this;
-        $(window).resize(function(){ //当用户调整窗口时触发resize
+        let outer = this;
+        $(window).resize(function () { //当用户调整窗口时触发resize
             outer.resize();
         });
     }
-    
-    resize(){
+
+    resize() {
         this.width = this.$playground.width();
         this.height = this.$playground.height();
-        let uint = Math.min(this.width / 16,this.height / 9);
-        this.height = uint *16;
+        let uint = Math.min(this.width / 16, this.height / 9);
+        this.height = uint * 16;
         this.height = uint * 9;
         this.scale = this.height;//基准值
 
-        if(this.game_map)this.game_map.resize();
+        if (this.game_map) this.game_map.resize();
     }
 
-    show() { //打开playground界面
+    show(mode) { //打开playground界面
+        let outer = this;
         this.$playground.show();
         this.resize();
         this.width = this.$playground.width();
         this.height = this.$playground.height();
         this.game_map = new GameMap(this);
-        this.players = []
-        this.players.push(new Player(this, this.width / 2/this.scale,  0.5 , 0.05, "white", 0.15, true));
 
-        for (let i = 0; i < 5; i++) {
-            this.players.push(new Player(this, this.width / 2 /this.scale, 0.5, 0.05, this.get_random_color(), 0.15, false))
+        this.resize();
+
+        this.players = []
+        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.15, "me", this.root.settings.username, this.root.settings.photo));
+
+        if (mode === "single mode") {
+            for (let i = 0; i < 5; i++) {
+                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.15, "robot"));
+            }
+        } else if (mode === "multi mode") {
+            this.mps  = new MutiPlayerSocket(this);
+            this.mps.uuid = this.players[0].uuid;
+
+            this.mps.ws.onopen = function(){
+                outer.mps.send_create_player(outer.root.settings.username,outer.root.settings.photo);
+            };
         }
-    }
+
+    } 
 
     hide() { //关闭playground界面
         this.$playground.hide();
