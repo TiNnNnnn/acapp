@@ -112,13 +112,13 @@ class Settings {
         this.start();
     }
     start() {
-        if(this.platform === "ACAPP"){
+        if (this.platform === "ACAPP") {
             this.getinfo_acapp();
-        }else{
+        } else {
             this.getinfo_web();
             this.add_listening_events();
         }
-        
+
     }
 
     add_listening_events() {
@@ -126,7 +126,7 @@ class Settings {
 
         this.add_listening_events_login();
         this.add_listening_events_register();
-        this.$acwing_login.click(function(){
+        this.$acwing_login.click(function () {
             outer.acwing_login();
         });
     }
@@ -141,7 +141,7 @@ class Settings {
             outer.login_on_remote();
         })
     }
-    
+
     add_listening_events_register() {
         let outer = this;
 
@@ -155,18 +155,18 @@ class Settings {
 
     }
 
-    acwing_login(){
-       $.ajax({
+    acwing_login() {
+        $.ajax({
             url: "https://app3073.acapp.acwing.com.cn/settings/acwing/web/apply_code/",
             type: "GET",
-            success: function(resp){
-                
+            success: function (resp) {
+
                 console.log(resp);
-                if(resp.result==="success"){
+                if (resp.result === "success") {
                     window.location.replace(resp.apply_code_url);
                 }
             }
-       });
+        });
 
     }
 
@@ -221,37 +221,39 @@ class Settings {
         });
 
     }
-    
+
     logout_on_remote() {//在远程服务器上登出
-        if (this.platform === "ACAPP") return false;
-        $.ajax({
-            url: "https://app3073.acapp.acwing.com.cn/settings/logout/",
-            type: "GET",
-            success: function (resp) {
-                console.log(resp);
-                if (resp.result === "success") {
-                    location.reload();
+        if (this.platform === "ACAPP") {
+            this.root.AcWingOS.api.window.close();//关闭窗口
+        } else {
+            $.ajax({
+                url: "https://app3073.acapp.acwing.com.cn/settings/logout/",
+                type: "GET",
+                success: function (resp) {
+                    if (resp.result === "success") {
+                        location.reload();
+                    }
                 }
-            }
-        });
+            });
+        }
+
     }
 
     resgister() {//打开注册界面
         this.$login.hide();
         this.$register.show();
     }
-    
+
     login() {//打开登录界
         this.$register.hide();
         this.$login.show();
     }
 
-    acapp_login(appid,redirect_uri,scope,state) {
+    acapp_login(appid, redirect_uri, scope, state) {
         let outer = this;
-        this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp){
-            console.log("called from acwing_login_function"); 
-            console.log(resp);
-            if(resp.result === "success"){
+        this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function (resp) {
+            console.log("called from acwing_login_function");
+            if (resp.result === "success") {
                 outer.username = resp.username;
                 outer.photo = resp.photo;
                 outer.hide();
@@ -260,14 +262,14 @@ class Settings {
         });
     }
 
-    getinfo_acapp(){
+    getinfo_acapp() {
         let outer = this;
         $.ajax({
             url: "https://app3073.acapp.acwing.com.cn/settings/acwing/acapp/apply_code/",
-            type:"GET",
-            success: function(resp){
-                if(resp.result === "success"){
-                    outer.acapp_login(resp.appid,resp.redirect_uri,resp.scope,resp.state);
+            type: "GET",
+            success: function (resp) {
+                if (resp.result === "success") {
+                    outer.acapp_login(resp.appid, resp.redirect_uri, resp.scope, resp.state);
                 }
             }
         });
@@ -282,7 +284,6 @@ class Settings {
                 platform: outer.platform,
             },
             success: function (resp) {
-                console.log(resp);
                 if (resp.result === "success") {
                     outer.username = resp.username;
                     outer.photo = resp.photo;
