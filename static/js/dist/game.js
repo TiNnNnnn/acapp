@@ -817,7 +817,7 @@ class MutiPlayerSocket {
         if (player) {
             player.move_to(tx, ty);
         }
-    }
+    } 
 
     send_shoot_fireball(tx, ty, ball_uuid) {
         let outer = this;
