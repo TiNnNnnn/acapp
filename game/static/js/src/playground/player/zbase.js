@@ -68,7 +68,7 @@ class Player extends AcGameObject {
             return false;
         });
         this.playground.game_map.$canvas.mousedown(function (e) {
-            
+
             if (outer.playground.state !== "fighting") {
                 return true;//不处理事件，false为阻断事件
             }
@@ -97,10 +97,10 @@ class Player extends AcGameObject {
                     if (outer.blink_coldtime > outer.eps) {
                         return false;
                     }
-                    outer.blink(tx,ty);
+                    outer.blink(tx, ty);
 
-                    if(outer.playground.mode == "multi mode") {
-                        outer.playground.mps.send_blink(tx,ty);
+                    if (outer.playground.mode == "multi mode") {
+                        outer.playground.mps.send_blink(tx, ty);
                     }
                 }
                 outer.cur_skil = null;
@@ -108,12 +108,12 @@ class Player extends AcGameObject {
         });
 
         this.playground.game_map.$canvas.keydown(function (e) {
-            if(e.which === 13){ //enter
-                if(outer.playground.mode === "multi mode"){ //打开聊天框
+            if (e.which === 13) { //enter
+                if (outer.playground.mode === "multi mode") { //打开聊天框
                     outer.playground.chat_field.show_input();
                 }
-            }else if (e.which === 27){ //esc
-                if(outer.playground.mode === "multi mode"){ //打开聊天框
+            } else if (e.which === 27) { //esc
+                if (outer.playground.mode === "multi mode") { //打开聊天框
                     outer.playground.chat_field.hide_input();
                 }
             }
@@ -126,8 +126,8 @@ class Player extends AcGameObject {
                 }
                 outer.cur_skil = "fireball";
                 return false;
-            }else if (e.which === 70) { //f
-                
+            } else if (e.which === 70) { //f
+
                 if (outer.blink_coldtime > outer.eps) {
                     return true;
                 }
@@ -148,7 +148,7 @@ class Player extends AcGameObject {
         let fireball = new FireBall(this.playground, this, x, y, radius, vx, vy, color, speed, move_length, 0.01);
         this.fireballs.push(fireball);
 
-        this.fireball_coldtime = 3;
+        this.fireball_coldtime = 0.1;
 
         return fireball;
     }
@@ -220,6 +220,8 @@ class Player extends AcGameObject {
     update() {
         this.spent_time += this.timedelta / 1000;
 
+        this.update_win();
+
         if (this.character === "me" && this.playground.state === "fighting") {
             this.update_coldtime();
         }
@@ -228,10 +230,17 @@ class Player extends AcGameObject {
         this.render();
     }
 
+    update_win() {
+        if (this.playground.state === "fighting" && this.character === "me" && this.playground.players.length === 1) {
+            this.playground.state = "over";
+            this.playground.score_board.win();
+        }
+    }
+
     update_coldtime() { //更新技能冷却时间
         this.fireball_coldtime -= this.timedelta / 1000;
         this.fireball_coldtime = Math.max(this.fireball_coldtime, 0);
-        this.blink_coldtime -=this.timedelta /1000;
+        this.blink_coldtime -= this.timedelta / 1000;
         this.blink_coldtime = Math.max(this.blink_coldtime, 0);
     }
 
@@ -332,8 +341,11 @@ class Player extends AcGameObject {
 
 
     on_destroy() {
-        if(this.character === "me")
+        if (this.character === "me" && this.playground.state === "fighting") {
             this.playground.state = "over";
+            this.playground.score_board.lose();
+        }
+
 
         for (let i = 0; i < this.playground.players.length; i++) {
             if (this.playground.players[i] == this) {

@@ -60,6 +60,7 @@ class Pool:
                 'photo':p.photo,
                 'hp': 100,
             })
+            
         cache.set(room_name,players,3600)
         for p in ps:
             async_to_sync(channel_layer.group_send)(
